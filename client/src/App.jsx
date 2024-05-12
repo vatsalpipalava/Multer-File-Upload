@@ -23,7 +23,7 @@ function App() {
         formData.append("avatar", avatar.file);
         try {
             const response = await axios.post(
-                "http://localhost:6690/api/v1/upload/avatar-upload",
+                `${import.meta.env.VITE_BACKEND_URL}/api/v1/upload/avatar-upload`,
                 formData,
                 {
                     headers: {
