@@ -14,8 +14,8 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(express.static("public"));
 app.use("/public", express.static(path.join("public")));
 
-import fileuploadRouter from "./routes/fileupload.routes.js";
+import user from "./routes/user.routes.js";
 
-app.use("/api/v1/upload", fileuploadRouter);
+app.use("/api/v1/auth", user);
 
 export { app };

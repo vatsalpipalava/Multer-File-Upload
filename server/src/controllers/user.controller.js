@@ -60,4 +60,18 @@ const fileUpload = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, "User Registered Successfully."));
 });
 
-export { fileUpload };
+const allUser = asyncHandler(async (req, res) => {
+    const users = await User.find();
+
+    if (users.length === 0) {
+        throw new ApiError(404, "User Not Found");
+    }
+
+    setTimeout(() => {
+        return res
+            .status(200)
+            .json(new ApiResponse(200, users, "All users fetch successfully."));
+    }, 5000);
+});
+
+export { fileUpload, allUser };
