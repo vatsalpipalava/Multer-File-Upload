@@ -18,6 +18,10 @@ const fileUpload = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required.");
     }
 
+    const avatarImageFileDTO = req.file;
+
+    console.log(avatarImageFileDTO);
+
     let avatarLocalPath;
 
     if (req.file) {

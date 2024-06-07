@@ -17,16 +17,17 @@ function EnterDetails() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const formData = new FormData();
-        formData.append("email", email);
-        formData.append("fullName", fullName);
-        formData.append("avatar", avatar.file);
+        // const formData = new FormData();
+        // formData.append("email", email);
+        // formData.append("fullName", fullName);
+        // formData.append("avatar", avatar.file);
+        // console.log(avatar.file);
         try {
             const response = await axios.post(
                 `${
                     import.meta.env.VITE_BACKEND_URL
                 }/api/v1/auth/avatar-upload`,
-                formData,
+                {email, fullName, avatar: avatar.file},
                 {
                     headers: {
                         "Content-Type": "multipart/form-data",
