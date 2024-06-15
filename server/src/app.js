@@ -5,7 +5,7 @@ import path from "path"
 const app = express();
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: ["http://localhost:5173", "http://localhost:5000"],
     credentials: true
 }))
 

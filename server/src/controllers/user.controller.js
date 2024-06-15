@@ -1,3 +1,6 @@
+import axios from "axios";
+import fs from "fs";
+import FormData from "form-data";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -20,12 +23,10 @@ const fileUpload = asyncHandler(async (req, res) => {
 
     const avatarImageFileDTO = req.file;
 
-    console.log(avatarImageFileDTO);
-
     let avatarLocalPath;
 
     if (req.file) {
-        avatarLocalPath = req.file.path;
+        avatarLocalPath = avatarImageFileDTO.path;
     }
 
     if (!avatarLocalPath) {
@@ -40,16 +41,48 @@ const fileUpload = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with email already exists.");
     }
 
-    const avatar = `${process.env.BACKEND_URL}/${avatarLocalPath.replace(/\\/g, "/")}`;
+    // Upload to image storage server
+    let externalAvatarUrl;
+    try {
+        const formData = new FormData();
+        formData.append("file", fs.createReadStream(avatarLocalPath));
 
-    if (!avatar) {
-        throw new ApiError(400, "Avatar file is required.");
+        const response = await axios.post(
+            "http://localhost:5000/api/v1/images/upload",
+            formData,
+            {
+                headers: {
+                    ...formData.getHeaders(),
+                },
+                withCredentials: true,
+            }
+        );
+
+        externalAvatarUrl = response.data.url;
+    } catch (error) {
+        throw new ApiError(
+            500,
+            "Failed to upload avatar to image storage server."
+        );
+    } finally {
+        // Cleanup local file
+        try {
+            await fs.promises.unlink(avatarLocalPath);
+        } catch (unlinkError) {
+            console.error(`Failed to delete local file: ${unlinkError}`);
+        }
     }
+
+    // const avatar = `${process.env.BACKEND_URL}/${avatarLocalPath.replace(/\\/g, "/")}`;
+
+    // if (!avatar) {
+    //     throw new ApiError(400, "Avatar file is required.");
+    // }
 
     const user = await User.create({
         email,
         fullName,
-        avatar,
+        avatar: externalAvatarUrl,
     });
 
     if (!user) {
